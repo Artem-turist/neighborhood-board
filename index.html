@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дошка оголошень</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Дошка оголошень</h1>
+        <nav aria-label="Головна навігація">
+            <ul>
+                <li><a href="#services">Послуги</a></li>
+                <li><a href="#lost-found">Бюро знахідок</a></li>
+                <li><a href="#sales">Віддам / Продам</a></li>
+                <li><a href="#add-ad" class="btn">Додати оголошення</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="filter-section">
+            <h2>Фільтр за категорією</h2>
+            <form action="#" method="get">
+                <label for="category-select">Оберіть категорію:</label>
+                <select id="category-select" name="category">
+                    <option value="all">Усі оголошення</option>
+                    <option value="services">Послуги</option>
+                    <option value="lost-found">Бюро знахідок</option>
+                    <option value="sales">Віддам / Продам</option>
+                </select>
+                <button type="submit">Застосувати</button>
+            </form>
+        </section>
+
+        <section id="ads-list">
+            <h2>Оголошення</h2>
+
+            <article>
+                <header>
+                    <h3>Знайдено ключі біля 2-го під'їзду</h3>
+                    <p><time datetime="2026-09-15">15 вересня 2026</time></p>
+                </header>
+                <img src="assets/img/keys.svg" alt="Зв'язка ключів з синім брелоком">
+                <p>Знайшов зв'язку ключів від квартири на лавці. Звертайтеся в 45 квартиру.</p>
+                <footer>
+                    <p>Категорія: <strong>Бюро знахідок</strong></p>
+                </footer>
+            </article>
+
+            <article>
+                <header>
+                    <h3>Допомога з ремонтом сантехніки</h3>
+                    <p><time datetime="2026-09-14">14 вересня 2026</time></p>
+                </header>
+                <p>Сусід з 12 квартири. Можу допомогти замінити змішувач або прочистити труби у вихідні.</p>
+                <footer>
+                    <p>Категорія: <strong>Послуги</strong></p>
+                </footer>
+            </article>
+
+            <article>
+                <header>
+                    <h3>Віддам дитячий самокат</h3>
+                    <p><time datetime="2026-09-10">10 вересня 2026</time></p>
+                </header>
+                <img src="assets/img/scooter.svg" alt="Триколісний червоний дитячий самокат">
+                <p>Справний, дитина виросла. Самовивіз, 3 поверх.</p>
+                <footer>
+                    <p>Категорія: <strong>Віддам / Продам</strong></p>
+                </footer>
+            </article>
+        </section>
+    </main>
+
+    <aside id="ad-details">
+        <h2>Деталі обраного оголошення</h2>
+        <p>Оберіть оголошення зі списку, щоб переглянути контакти автора та детальну інформацію.</p>
+        <div class="author-info">
+            <p><strong>Контактна особа:</strong> Олексій (кв. 45)</p>
+            <p><strong>Телефон:</strong> +380 (XX) XXX-XX-XX</p>
+        </div>
+    </aside>
+
+    <footer>
+        <p>&copy; 2026 Дошка сусідських оголошень. ФІОТ КПІ ім. Ігоря Сікорського.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
