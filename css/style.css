@@ -1,0 +1,175 @@
+/* 1. Глобальне скидання та блокова модель */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* 2. Базова типографіка та палітра */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    background-color: #f7f3ee; /* Теплий крафтовий відтінок */
+    color: #2d2a26;
+}
+
+/* 3. Стилізація Header */
+header {
+    background-color: #ffffff;
+    border-bottom: 2px solid #e2dacd;
+    padding: 20px 32px;
+}
+
+header h1 {
+    margin: 0 0 16px 0;
+    font-size: 2rem;
+    color: #4a3b32;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #5c5248;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: #8c532b;
+}
+
+/* Кнопка «Додати оголошення» за вимогами варіанта */
+nav a.btn {
+    background-color: #c86d3b;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+}
+
+nav a.btn:hover {
+    background-color: #a85424;
+    color: #ffffff;
+}
+
+/* 4. Центрування та розмітка Main */
+main, aside {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+section {
+    margin-bottom: 32px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #4a3b32;
+    border-bottom: 1px solid #dfd5c6;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+/* Форма фільтрації */
+#filter-section form {
+    background-color: #ffffff;
+    padding: 16px;
+    border: 1px solid #e2dacd;
+    border-radius: 8px;
+}
+
+#filter-section label {
+    margin-right: 8px;
+    font-weight: 500;
+}
+
+#filter-section select {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+#filter-section button {
+    padding: 6px 14px;
+    background-color: #5c5248;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* 5. Картки оголошень (article) */
+article {
+    background-color: #ffffff;
+    border: 1px solid #e2dacd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+article h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    color: #2d2a26;
+}
+
+article time {
+    font-size: 0.85rem;
+    color: #7d7265;
+}
+
+article img {
+    display: block;
+    max-width: 120px;
+    height: auto;
+    margin: 12px 0;
+    border-radius: 4px;
+}
+
+article footer {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px dashed #e2dacd;
+    font-size: 0.9rem;
+    color: #5c5248;
+}
+
+/* 6. Блок Aside (Деталі оголошення) */
+aside#ad-details {
+    background-color: #ede4d8;
+    border: 1px solid #d5c7b5;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+aside h2 {
+    margin-top: 0;
+    border-bottom-color: #cbbba6;
+}
+
+.author-info {
+    background-color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-top: 12px;
+}
+
+/* 7. Підвал (Footer) */
+body > footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 0.85rem;
+    color: #7d7265;
+    border-top: 1px solid #e2dacd;
+    margin-top: 40px;
+}
