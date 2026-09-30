@@ -1,27 +1,33 @@
-/* 1. Глобальне скидання та блокова модель */
+/* 1. Глобальне скидання та базові налаштування */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* 2. Базова типографіка та палітра */
 body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
-    background-color: #f7f3ee; /* Теплий крафтовий відтінок */
+    background-color: #f7f3ee;
     color: #2d2a26;
 }
 
-/* 3. Стилізація Header */
+/* Гумові зображення (щоб не вилазили за екран на мобільних) */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 2. Шапка (Мобільний вигляд за замовчуванням) */
 header {
     background-color: #ffffff;
     border-bottom: 2px solid #e2dacd;
-    padding: 20px 32px;
+    padding: 16px 20px;
 }
 
 header h1 {
-    margin: 0 0 16px 0;
-    font-size: 2rem;
+    margin: 0 0 12px 0;
+    font-size: 1.75rem;
     color: #4a3b32;
 }
 
@@ -30,9 +36,8 @@ nav ul {
     margin: 0;
     padding: 0;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column; /* Стовпчиком на мобільному */
+    gap: 10px;
 }
 
 nav a {
@@ -41,38 +46,24 @@ nav a {
     font-weight: 500;
 }
 
-nav a:hover {
-    color: #8c532b;
-}
-
-/* Кнопка «Додати оголошення» за вимогами варіанта */
 nav a.btn {
     background-color: #c86d3b;
     color: #ffffff;
     padding: 10px 18px;
     border-radius: 6px;
+    text-align: center;
     display: inline-block;
-    transition: background-color 0.2s ease;
 }
 
-nav a.btn:hover {
-    background-color: #a85424;
-    color: #ffffff;
-}
-
-/* 4. Центрування та розмітка Main */
+/* 3. Основний макет */
 main, aside {
-    max-width: 900px;
-    margin: 24px auto;
+    max-width: 1100px;
+    margin: 20px auto;
     padding: 0 16px;
 }
 
-section {
-    margin-bottom: 32px;
-}
-
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #4a3b32;
     border-bottom: 1px solid #dfd5c6;
     padding-bottom: 8px;
@@ -85,42 +76,44 @@ h2 {
     padding: 16px;
     border: 1px solid #e2dacd;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-#filter-section label {
-    margin-right: 8px;
-    font-weight: 500;
-}
-
-#filter-section select {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
+#filter-section select, #filter-section button {
+    padding: 8px 12px;
     border-radius: 4px;
-    font-size: 0.95rem;
+    border: 1px solid #ccc;
 }
 
 #filter-section button {
-    padding: 6px 14px;
     background-color: #5c5248;
     color: #fff;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
-/* 5. Картки оголошень (article) */
+/* 4. CSS Grid для карток (Мобільний: 1 колонка) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
 article {
     background-color: #ffffff;
     border: 1px solid #e2dacd;
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 article h3 {
     margin: 0 0 8px 0;
-    font-size: 1.25rem;
-    color: #2d2a26;
+    font-size: 1.15rem;
 }
 
 article time {
@@ -129,47 +122,75 @@ article time {
 }
 
 article img {
-    display: block;
-    max-width: 120px;
-    height: auto;
     margin: 12px 0;
     border-radius: 4px;
 }
 
-article footer {
-    margin-top: 12px;
-    padding-top: 8px;
-    border-top: 1px dashed #e2dacd;
-    font-size: 0.9rem;
-    color: #5c5248;
-}
-
-/* 6. Блок Aside (Деталі оголошення) */
+/* 5. Бічна панель і підвал */
 aside#ad-details {
     background-color: #ede4d8;
     border: 1px solid #d5c7b5;
     border-radius: 8px;
-    padding: 20px;
-}
-
-aside h2 {
-    margin-top: 0;
-    border-bottom-color: #cbbba6;
+    padding: 16px;
 }
 
 .author-info {
     background-color: #ffffff;
-    padding: 12px 16px;
+    padding: 12px;
     border-radius: 6px;
-    margin-top: 12px;
+    margin-top: 10px;
 }
 
-/* 7. Підвал (Footer) */
 body > footer {
     text-align: center;
-    padding: 24px 16px;
+    padding: 20px 16px;
     font-size: 0.85rem;
     color: #7d7265;
     border-top: 1px solid #e2dacd;
-    margin-top: 40px;
+    margin-top: 30px;
 }
+
+/* =======================================
+   6. ПЛАНШЕТНИЙ BREAKPOINT (від 600px)
+   ======================================= */
+@media (min-width: 600px) {
+    nav ul {
+        flex-direction: row; /* Навігація в рядок */
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+    }
+
+    #filter-section form {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    /* Сітка стає на 2 колонки */
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* =======================================
+   7. ДЕСКТОПНИЙ BREAKPOINT (від 1024px)
+   ======================================= */
+@media (min-width: 1024px) {
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+    }
+
+    header h1 {
+        margin: 0;
+    }
+
+    /* Сітка стає на 3 колонки */
+    .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}   
