@@ -1,70 +1,124 @@
 // ==========================================================================
-// Практична робота №6: Основи JavaScript
+// Комп'ютерний практикум №7: Маніпуляція DOM за допомогою JavaScript
 // Варіант №18: Дошка сусідських оголошень
+// Студент: Музиченко А.А., група ІП-55
 // ==========================================================================
 
-// Крок 3: Перевірка підключення файлу
-console.log('--- script.js успішно підключено ---');
-
-// Крок 4: Оголошення даних варіанта (масив об'єктів оголошень)
-// Поля: title — заголовок, category — категорія, daysAgo — днів тому
+// Крок 4 (з практ. 6): Масив даних оголошень
 const ads = [
     {
-        title: "Знайдено зв'язку ключів від квартири з синім брелоком біля другого під'їзду",
+        title: "Знайдено ключі біля 2-го під'їзду",
+        description: "Знайшов зв'язку ключів від квартири на лавці. Звертайтеся в 45 квартиру.",
         category: "Бюро знахідок",
+        badgeClass: "badge--lost-found",
         daysAgo: 2
     },
     {
-        title: "Допомога з терміновим ремонтом сантехніки та прочищенням труб",
+        title: "Допомога з ремонтом сантехніки",
+        description: "Сусід з 12 квартири. Можу допомогти замінити змішувач або прочистити труби у вихідні.",
         category: "Послуги",
-        daysAgo: 16 // > 14 днів — буде «застаріле»
+        badgeClass: "badge--services",
+        daysAgo: 16 // > 14 днів -> клас outdated
     },
     {
-        title: "Віддам дитячий триколісний самокат у справному стані",
+        title: "Віддам дитячий самокат",
+        description: "Справний, дитина виросла. Самовивіз, 3 поверх.",
         category: "Віддам / Продам",
+        badgeClass: "badge--sales",
         daysAgo: 7
     },
     {
-        title: "Загублено окуляри в чорній оправі на дитячому майданчику",
+        title: "Загублено чорний гаманець біля пошти",
+        description: "Всередині були документи на ім'я Сергій. Прошу повернути за винагороду.",
         category: "Бюро знахідок",
-        daysAgo: 20 // > 14 днів — буде «застаріле»
+        badgeClass: "badge--lost-found",
+        daysAgo: 22 // > 14 днів -> клас outdated
     },
     {
-        title: "Послуги електрика: заміна розеток, вимикачів, автоматів",
+        title: "Послуги репетитора з англійської",
+        description: "Розмовна англійська для школярів та дорослих, підготовка до іспитів онлайн.",
         category: "Послуги",
+        badgeClass: "badge--services",
         daysAgo: 4
     }
 ];
 
+// Допоміжна стрілкова функція форматування тексту (з практикуму 6)
 const shorten = (text, n) => text.length > n ? text.slice(0, n) + '…' : text;
 
-console.log('\nТест стрілкової функції shorten:');
-console.log(shorten("Дуже довгий заголовок оголошення, який треба скоротити", 25));
+// --------------------------------------------------------------------------
+// КРОКИ ПРАКТИЧНОЇ РОБОТИ №7:
+// --------------------------------------------------------------------------
 
-function printAdsByCategory(adsList, targetCategory) {
-    console.log(`\n=== Оголошення в категорії: "${targetCategory}" ===`);
-    let count = 0;
+// Крок 3: Вибір контейнера списку оголошень за селектором #listings-list
+const listContainer = document.querySelector('#listings-list');
 
+// Крок 9 (вибір): Елемент підсумку для відображення кількості активних оголошень
+const countElement = document.querySelector('#listings-count');
+
+// Крок 2: Програмне видалення статичного прикладу (заглушки) з розмітки
+const staticPlaceholder = document.querySelector('#static-placeholder');
+if (staticPlaceholder) {
+    staticPlaceholder.remove();
+    console.log('Статичний приклад успішно видалено з DOM через .remove()');
+}
+
+// Крок 4: Функція динамічного рендерингу карток оголошень
+function renderAds(adsList) {
+    // Очищуємо контейнер перед рендером
+    listContainer.innerHTML = '';
+
+    let activeCount = 0; // Лічильник активних оголошень
+
+    // Проходимо по масиву оголошень циклом for...of
     for (const ad of adsList) {
-        if (ad.category === targetCategory) {
-            count++;
+        // Крок 5: Створення кореневого елемента картки <article>
+        const card = document.createElement('article');
 
-            // Крок 6: Умова if/else (тернарний оператор) — перевірка daysAgo > 14
-            const status = ad.daysAgo > 14 ? '⚠️ [Застаріле]' : '✅ [Актуальне]';
+        // Крок 6: Встановлення data-атрибута data-days-ago
+        card.dataset.daysAgo = ad.daysAgo;
 
-            // Застосовуємо стрілкову функцію shorten для скорочення заголовка до 40 символів
-            const displayTitle = shorten(ad.title, 40);
-
-            console.log(`${count}. ${status} (${ad.daysAgo} дн. тому) -> ${displayTitle}`);
+        // Крок 6: Додавання класу за умовою варіанта: outdated, якщо daysAgo > 14
+        if (ad.daysAgo > 14) {
+            card.classList.add('outdated');
+        } else {
+            activeCount++; // Рахуємо тільки активні оголошення
         }
+
+        // Створення внутрішніх елементів картки:
+        // 1. Шапка картки (header, h3, time)
+        const cardHeader = document.createElement('header');
+        const title = document.createElement('h3');
+        title.textContent = ad.title;
+
+        const time = document.createElement('time');
+        time.textContent = `${ad.daysAgo} дн. тому`;
+
+        cardHeader.append(title, time);
+
+        // 2. Текст опису (p)
+        const desc = document.createElement('p');
+        desc.textContent = ad.description;
+
+        // 3. Підвал картки з кольоровим бейджем (footer, span.badge)
+        const cardFooter = document.createElement('footer');
+        const badge = document.createElement('span');
+        badge.classList.add('badge', ad.badgeClass);
+        badge.textContent = ad.category;
+        cardFooter.append(badge);
+
+        // Збираємо картку разом
+        card.append(cardHeader, desc, cardFooter);
+
+        // Крок 7: Додаємо готову картку в контейнер
+        listContainer.append(card);
     }
 
-    if (count === 0) {
-        console.log(`У категорії "${targetCategory}" оголошень немає.`);
+    // Крок 9: Оновлення підсумкового елемента p#listings-count
+    if (countElement) {
+        countElement.textContent = `Активних оголошень: ${activeCount} з ${adsList.length}`;
     }
 }
 
-// Виклики функції для кожної категорії з нашої дошки
-printAdsByCategory(ads, "Бюро знахідок");
-printAdsByCategory(ads, "Послуги");
-printAdsByCategory(ads, "Віддам / Продам");
+// Крок 8: Виклик функції рендерингу з реальним масивом даних
+renderAds(ads);

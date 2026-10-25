@@ -37,7 +37,21 @@
         </section>
 
         <section id="ads-list">
-            <h2>Оголошення</h2>
+            <header class="section-header">
+                <h2>Оголошення</h2>
+                <!-- Підсумок за варіантом 18: лічильник активних оголошень -->
+                <p id="listings-count">Завантаження кількості оголошень...</p>
+            </header>
+
+            <!-- Контейнер списку з id="listings-list" та класом сітки cards-grid -->
+            <div id="listings-list" class="cards-grid">
+                <!-- Статичний приклад із практичної №2, який буде динамічно видалено через .remove() -->
+                <article id="static-placeholder" class="card-placeholder">
+                    <h3>Завантаження оголошень зі списку...</h3>
+                    <p>Будь ласка, зачекайте.</p>
+                </article>
+            </div>
+        </section>
 
             <div class="cards-grid">
                 <article id="lost-found">
