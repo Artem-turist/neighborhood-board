@@ -73,6 +73,7 @@ nav a.btn {
     text-align: center;
     display: inline-block;
     font-weight: 600;
+    cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
@@ -143,10 +144,6 @@ h2 {
 
 /* ==========================================================================
    5. КАРТКИ ОГОЛОШЕНЬ ТА НЕЧІТКА ВИМОГА
-   Обґрунтування нечіткої вимоги («дружня спільнота, а не барахолка»):
-   - Охайні білі плашки карток із м'яким бордером і плавною тінню.
-   - Щедре «повітря» (padding 20px, gap 24px) без крикливих рамок.
-   - Дрібна, ненав'язлива дата (#7a6d63).
    ========================================================================== */
 .cards-grid {
     display: grid;
@@ -192,7 +189,6 @@ article h3 {
     line-height: 1.3;
 }
 
-/* Деталі: дата як ненав'язливий другорядний елемент */
 article time {
     font-size: 0.8rem;
     color: #7a6d63;
@@ -221,7 +217,6 @@ article footer {
 
 /* ==========================================================================
    6. ЧІТКА ВИМОГА: КОЛЬОРОВІ БЕЙДЖІ КАТЕГОРІЙ
-   Усі кольори перевірено за WCAG AA на фоні бейджа (контраст > 4.5:1)
    ========================================================================== */
 .badge {
     display: inline-block;
@@ -232,22 +227,19 @@ article footer {
     letter-spacing: 0.01em;
 }
 
-/* Бюро знахідок: спокійний синій тон */
 .badge--lost-found {
     background-color: #e3edf7;
-    color: #174a7a; /* Контраст 6.8:1 */
+    color: #174a7a;
 }
 
-/* Послуги: стриманий бірюзово-зелений тон */
 .badge--services {
     background-color: #e2f2ea;
-    color: #1b5e39; /* Контраст 5.4:1 */
+    color: #1b5e39;
 }
 
-/* Віддам / Продам: теплий теракотовий тон */
 .badge--sales {
     background-color: #faede4;
-    color: #8c3b08; /* Контраст 5.7:1 */
+    color: #8c3b08;
 }
 
 /* ==========================================================================
@@ -327,10 +319,8 @@ body > footer {
 }
 
 /* ==========================================================================
-   9. ПРАКТИЧНА РОБОТА №7: ДИНАМІЧНИЙ DOM, ЛІЧИЛЬНИК ТА КЛАСИ
+   9. ПРАКТИЧНА РОБОТА №7: ДИНАМІЧНИЙ DOM ТА КЛАСИ
    ========================================================================== */
-
-/* Блок заголовка секції разом із лічильником */
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -344,7 +334,6 @@ body > footer {
     margin-bottom: 0;
 }
 
-/* Підсумковий лічильник оголошень (p#listings-count) */
 #listings-count {
     margin: 0;
     font-size: 0.95rem;
@@ -357,7 +346,6 @@ body > footer {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* Вимога варіанта 18: клас для застарілих оголошень (daysAgo > 14) */
 article.outdated {
     opacity: 0.75;
     background-color: #fbf9f6;
@@ -372,4 +360,96 @@ article.outdated::before {
     color: #a85213;
     margin-bottom: 6px;
     display: block;
+}
+
+/* ==========================================================================
+   10. ПРАКТИЧНА РОБОТА №8: ФОРМА ДОДАВАННЯ ОГОЛОШЕННЯ ТА ВАЛІДАЦІЯ
+   ========================================================================== */
+
+/* За замовчуванням форма прихована */
+#add-ad-section {
+    display: none;
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e5ded3;
+    box-shadow: 0 4px 12px rgba(45, 38, 33, 0.06);
+    margin-bottom: 32px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Коли додається клас .visible, форма з'являється */
+#add-ad-section.visible {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #3b2f27;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #cfc4b6;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #2d2621;
+    background-color: #fdfcfb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #b85d19;
+    box-shadow: 0 0 0 3px rgba(184, 93, 25, 0.15);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+/* Лічильник символів за варіантом 18 */
+.char-counter {
+    font-size: 0.8rem;
+    color: #7a6d63;
+    text-align: right;
+    margin-top: 4px;
+}
+
+.char-counter.near-limit {
+    color: #c92a2a;
+    font-weight: 600;
+}
+
+.btn-submit {
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-top: 8px;
+}
+
+@media (min-width: 600px) {
+    .btn-submit {
+        width: auto;
+    }
 }

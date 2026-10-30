@@ -1,10 +1,8 @@
 // ==========================================================================
-// Комп'ютерний практикум №7: Маніпуляція DOM за допомогою JavaScript
-// Варіант №18: Дошка сусідських оголошень
-// Студент: Музиченко А.А., група ІП-55
+// Комп'ютерний практикум №8: Обробка подій та форми, клієнтська валідація
 // ==========================================================================
 
-// Крок 4 (з практ. 6): Масив даних оголошень
+// Масив даних оголошень
 const ads = [
     {
         title: "Знайдено ключі біля 2-го під'їзду",
@@ -18,7 +16,7 @@ const ads = [
         description: "Сусід з 12 квартири. Можу допомогти замінити змішувач або прочистити труби у вихідні.",
         category: "Послуги",
         badgeClass: "badge--services",
-        daysAgo: 16 // > 14 днів -> клас outdated
+        daysAgo: 16 // > 14 днів -> застаріле
     },
     {
         title: "Віддам дитячий самокат",
@@ -32,7 +30,7 @@ const ads = [
         description: "Всередині були документи на ім'я Сергій. Прошу повернути за винагороду.",
         category: "Бюро знахідок",
         badgeClass: "badge--lost-found",
-        daysAgo: 22 // > 14 днів -> клас outdated
+        daysAgo: 22 // > 14 днів -> застаріле
     },
     {
         title: "Послуги репетитора з англійської",
@@ -43,82 +41,150 @@ const ads = [
     }
 ];
 
-// Допоміжна стрілкова функція форматування тексту (з практикуму 6)
-const shorten = (text, n) => text.length > n ? text.slice(0, n) + '…' : text;
-
-// --------------------------------------------------------------------------
-// КРОКИ ПРАКТИЧНОЇ РОБОТИ №7:
-// --------------------------------------------------------------------------
-
-// Крок 3: Вибір контейнера списку оголошень за селектором #listings-list
+// Селектори ключових елементів DOM
 const listContainer = document.querySelector('#listings-list');
-
-// Крок 9 (вибір): Елемент підсумку для відображення кількості активних оголошень
 const countElement = document.querySelector('#listings-count');
-
-// Крок 2: Програмне видалення статичного прикладу (заглушки) з розмітки
 const staticPlaceholder = document.querySelector('#static-placeholder');
+
+// Видалення статичної заглушки з практикуму 7
 if (staticPlaceholder) {
     staticPlaceholder.remove();
-    console.log('Статичний приклад успішно видалено з DOM через .remove()');
 }
 
-// Крок 4: Функція динамічного рендерингу карток оголошень
+// --------------------------------------------------------------------------
+// ФУНКЦІЯ РЕНДЕРИНГУ КАРТОК (Практикум №7)
+// --------------------------------------------------------------------------
 function renderAds(adsList) {
-    // Очищуємо контейнер перед рендером
     listContainer.innerHTML = '';
+    let activeCount = 0;
 
-    let activeCount = 0; // Лічильник активних оголошень
-
-    // Проходимо по масиву оголошень циклом for...of
     for (const ad of adsList) {
-        // Крок 5: Створення кореневого елемента картки <article>
         const card = document.createElement('article');
-
-        // Крок 6: Встановлення data-атрибута data-days-ago
         card.dataset.daysAgo = ad.daysAgo;
 
-        // Крок 6: Додавання класу за умовою варіанта: outdated, якщо daysAgo > 14
         if (ad.daysAgo > 14) {
             card.classList.add('outdated');
         } else {
-            activeCount++; // Рахуємо тільки активні оголошення
+            activeCount++;
         }
 
-        // Створення внутрішніх елементів картки:
-        // 1. Шапка картки (header, h3, time)
+        // Шапка картки
         const cardHeader = document.createElement('header');
         const title = document.createElement('h3');
         title.textContent = ad.title;
 
         const time = document.createElement('time');
-        time.textContent = `${ad.daysAgo} дн. тому`;
+        time.textContent = ad.daysAgo === 0 ? 'Сьогодні' : `${ad.daysAgo} дн. тому`;
 
         cardHeader.append(title, time);
 
-        // 2. Текст опису (p)
+        // Текст опису
         const desc = document.createElement('p');
         desc.textContent = ad.description;
 
-        // 3. Підвал картки з кольоровим бейджем (footer, span.badge)
+        // Підвал з кольоровим бейджем
         const cardFooter = document.createElement('footer');
         const badge = document.createElement('span');
         badge.classList.add('badge', ad.badgeClass);
         badge.textContent = ad.category;
         cardFooter.append(badge);
 
-        // Збираємо картку разом
         card.append(cardHeader, desc, cardFooter);
-
-        // Крок 7: Додаємо готову картку в контейнер
         listContainer.append(card);
     }
 
-    // Крок 9: Оновлення підсумкового елемента p#listings-count
     if (countElement) {
         countElement.textContent = `Активних оголошень: ${activeCount} з ${adsList.length}`;
     }
 }
 
-// Крок 8: Виклик функції рендерингу з реальним масивом даних
+// Початковий рендеринг при завантаженні сторінки
 renderAds(ads);
+
+// ==========================================================================
+// ПРАКТИЧНА РОБОТА №8: ОБРОБКА ПОДІЙ ТА ВАЛІДАЦІЯ (Варіант №18)
+// ==========================================================================
+
+// Селектори елементів форми
+const toggleFormBtn = document.querySelector('#toggle-form-btn');
+const addAdSection = document.querySelector('#add-ad-section');
+const addAdForm = document.querySelector('#add-ad-form');
+const descTextarea = document.querySelector('#ad-description');
+const charsLeftSpan = document.querySelector('#chars-left');
+const charCounterDiv = document.querySelector('#char-counter');
+
+// 1. ПОДІЯ CLICK (Варіант 18: показ/приховування форми без окремої сторінки)
+toggleFormBtn.addEventListener('click', (event) => {
+    event.preventDefault(); // Запобігаємо переходу за якірним посиланням #add-ad
+    addAdSection.classList.toggle('visible');
+
+    // Якщо форма відкрилася — автоматично фокусуємося на першому полі
+    if (addAdSection.classList.contains('visible')) {
+        document.querySelector('#ad-title').focus();
+    }
+});
+
+// 2. ПОДІЯ INPUT (Варіант 18: лічильник залишкових символів для description)
+const MAX_CHARS = 200;
+
+descTextarea.addEventListener('input', () => {
+    const currentLength = descTextarea.value.length;
+    const remaining = MAX_CHARS - currentLength;
+
+    charsLeftSpan.textContent = remaining;
+
+    // Якщо залишилося менше 20 символів — підсвічуємо червоним кольором
+    if (remaining <= 20) {
+        charCounterDiv.classList.add('near-limit');
+    } else {
+        charCounterDiv.classList.remove('near-limit');
+    }
+});
+
+// 3. ПОДІЯ SUBMIT (Варіант 18: обробка форми без перезавантаження)
+addAdForm.addEventListener('submit', (event) => {
+    // Крок 3: Скасування стандартного перезавантаження сторінки браузером
+    event.preventDefault();
+
+    // Крок 4: Зчитування та очищення значень полів
+    const titleValue = document.querySelector('#ad-title').value.trim();
+    const categorySelect = document.querySelector('#ad-category');
+    const categoryValue = categorySelect.value;
+    const descValue = descTextarea.value.trim();
+
+    // Співставлення технічного значення категорії з гарною назвою та класом бейджа
+    let categoryName = "Послуги";
+    let badgeClass = "badge--services";
+
+    if (categoryValue === "lost-found") {
+        categoryName = "Бюро знахідок";
+        badgeClass = "badge--lost-found";
+    } else if (categoryValue === "sales") {
+        categoryName = "Віддам / Продам";
+        badgeClass = "badge--sales";
+    }
+
+    // Крок 5: Формування нового об'єкта оголошення (daysAgo: 0 для нового запису)
+    const newAd = {
+        title: titleValue,
+        description: descValue,
+        category: categoryName,
+        badgeClass: badgeClass,
+        daysAgo: 0 // Свіже оголошення, щойно створене
+    };
+
+    // Додаємо нове оголошення на початок масиву
+    ads.unshift(newAd);
+
+    // Крок 6: Перемальовуємо список оголошень за допомогою функції рендерингу
+    renderAds(ads);
+
+    // Крок 7: Очищення полів форми та скидання лічильника символів
+    addAdForm.reset();
+    charsLeftSpan.textContent = MAX_CHARS;
+    charCounterDiv.classList.remove('near-limit');
+
+    // Ховаємо форму після успішного додавання та сповіщаємо в консоль
+    addAdSection.classList.remove('visible');
+    console.log('Нове оголошення успішно додано без перезавантаження сторінки:', newAd);
+});
