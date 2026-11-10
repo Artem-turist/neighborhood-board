@@ -168,7 +168,6 @@ article:hover {
     box-shadow: 0 6px 14px rgba(45, 38, 33, 0.08);
 }
 
-/* Шапка картки оголошення */
 article header {
     display: flex;
     flex-direction: column;
@@ -324,14 +323,20 @@ body > footer {
 .section-header {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 14px;
     margin-bottom: 20px;
 }
 
 .section-header h2 {
     margin-bottom: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 #listings-count {
@@ -363,10 +368,8 @@ article.outdated::before {
 }
 
 /* ==========================================================================
-   10. ПРАКТИЧНА РОБОТА №8: ФОРМА ДОДАВАННЯ ОГОЛОШЕННЯ ТА ВАЛІДАЦІЯ
+   10. ПРАКТИЧНА РОБОТА №8: ФОРМА ДОДАВАННЯ ТА ВАЛІДАЦІЯ
    ========================================================================== */
-
-/* За замовчуванням форма прихована */
 #add-ad-section {
     display: none;
     background-color: #ffffff;
@@ -378,7 +381,6 @@ article.outdated::before {
     animation: fadeIn 0.3s ease;
 }
 
-/* Коли додається клас .visible, форма з'являється */
 #add-ad-section.visible {
     display: block;
 }
@@ -391,7 +393,7 @@ article.outdated::before {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     margin-bottom: 16px;
 }
 
@@ -422,11 +424,21 @@ article.outdated::before {
     box-shadow: 0 0 0 3px rgba(184, 93, 25, 0.15);
 }
 
-.form-group textarea {
-    resize: vertical;
+.form-group input.input-error,
+.form-group select.input-error,
+.form-group textarea.input-error {
+    border-color: #c92a2a;
+    background-color: #fff5f5;
 }
 
-/* Лічильник символів за варіантом 18 */
+/* Повідомлення про власну валідацію (зауваження викладача) */
+.error-message {
+    color: #c92a2a;
+    font-size: 0.82rem;
+    font-weight: 500;
+    min-height: 1.1rem;
+}
+
 .char-counter {
     font-size: 0.8rem;
     color: #7a6d63;
@@ -452,4 +464,56 @@ article.outdated::before {
     .btn-submit {
         width: auto;
     }
+}
+
+/* ==========================================================================
+   11. ПРАКТИЧНА РОБОТА №9: КЛІЄНТ ДЛЯ API (FETCH/AJAX)
+   ========================================================================== */
+
+/* Кнопка оновлення списку (Крок 10) */
+.btn-reload {
+    background-color: #ffffff;
+    color: #594c42;
+    border: 1px solid #cfc4b6;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-reload:hover:not(:disabled) {
+    background-color: #f7f4ef;
+    border-color: #b85d19;
+    color: #b85d19;
+}
+
+.btn-reload:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Блок стану завантаження та помилок мережі */
+.status-message {
+    display: none;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.status-message.loading {
+    display: block;
+    background-color: #e3edf7;
+    color: #174a7a;
+    border: 1px solid #bfdbfe;
+}
+
+.status-message.error {
+    display: block;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
 }

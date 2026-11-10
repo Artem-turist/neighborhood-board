@@ -1,58 +1,18 @@
-// ==========================================================================
-// Комп'ютерний практикум №8: Обробка подій та форми, клієнтська валідація
-// ==========================================================================
 
-// Масив даних оголошень
-const ads = [
-    {
-        title: "Знайдено ключі біля 2-го під'їзду",
-        description: "Знайшов зв'язку ключів від квартири на лавці. Звертайтеся в 45 квартиру.",
-        category: "Бюро знахідок",
-        badgeClass: "badge--lost-found",
-        daysAgo: 2
-    },
-    {
-        title: "Допомога з ремонтом сантехніки",
-        description: "Сусід з 12 квартири. Можу допомогти замінити змішувач або прочистити труби у вихідні.",
-        category: "Послуги",
-        badgeClass: "badge--services",
-        daysAgo: 16 // > 14 днів -> застаріле
-    },
-    {
-        title: "Віддам дитячий самокат",
-        description: "Справний, дитина виросла. Самовивіз, 3 поверх.",
-        category: "Віддам / Продам",
-        badgeClass: "badge--sales",
-        daysAgo: 7
-    },
-    {
-        title: "Загублено чорний гаманець біля пошти",
-        description: "Всередині були документи на ім'я Сергій. Прошу повернути за винагороду.",
-        category: "Бюро знахідок",
-        badgeClass: "badge--lost-found",
-        daysAgo: 22 // > 14 днів -> застаріле
-    },
-    {
-        title: "Послуги репетитора з англійської",
-        description: "Розмовна англійська для школярів та дорослих, підготовка до іспитів онлайн.",
-        category: "Послуги",
-        badgeClass: "badge--services",
-        daysAgo: 4
-    }
-];
+// Крок 3: URL ендпоінта для отримання даних (Варіант 18)
+const API_URL = 'https://jsonplaceholder.typicode.com/posts?userId=3';
 
-// Селектори ключових елементів DOM
+// Масив оголошень у пам'яті (заповнюватиметься з API та форми)
+let ads = [];
+
+// Селектори DOM
 const listContainer = document.querySelector('#listings-list');
 const countElement = document.querySelector('#listings-count');
-const staticPlaceholder = document.querySelector('#static-placeholder');
-
-// Видалення статичної заглушки з практикуму 7
-if (staticPlaceholder) {
-    staticPlaceholder.remove();
-}
+const statusMessage = document.querySelector('#status-message');
+const reloadBtn = document.querySelector('#reload-btn');
 
 // --------------------------------------------------------------------------
-// ФУНКЦІЯ РЕНДЕРИНГУ КАРТОК (Практикум №7)
+// ФУНКЦІЯ РЕНДЕРИНГУ КАРТОК У DOM (з Практикуму №7)
 // --------------------------------------------------------------------------
 function renderAds(adsList) {
     listContainer.innerHTML = '';
@@ -82,7 +42,7 @@ function renderAds(adsList) {
         const desc = document.createElement('p');
         desc.textContent = ad.description;
 
-        // Підвал з кольоровим бейджем
+        // Підвал з бейджем категорії
         const cardFooter = document.createElement('footer');
         const badge = document.createElement('span');
         badge.classList.add('badge', ad.badgeClass);
@@ -98,93 +58,214 @@ function renderAds(adsList) {
     }
 }
 
-// Початковий рендеринг при завантаженні сторінки
-renderAds(ads);
+// --------------------------------------------------------------------------
+// АСИНХРОННЕ ЗАВАНТАЖЕННЯ ДАНИХ З API (Практикум №9)
+// --------------------------------------------------------------------------
+async function loadAdsFromAPI() {
+    // Крок 7: Візуальний стан завантаження
+    statusMessage.textContent = '⏳ Завантаження свіжих оголошень з сервера...';
+    statusMessage.className = 'status-message loading';
+    reloadBtn.disabled = true;
+
+    try {
+        // Крок 3: Виконання HTTP-запиту через fetch
+        const response = await fetch(API_URL);
+
+        // Крок 4: Перевірка HTTP-статусу (200-299)
+        if (!response.ok) {
+            throw new Error(`Сервер відповів зі статусом помилки: ${response.status}`);
+        }
+
+        // Крок 5: Розбір відповіді як JSON
+        const remotePosts = await response.json();
+        console.log('Дані успішно отримано від API:', remotePosts);
+
+        // Крок 6: Адаптація отриманих полів (title, body) під формат нашого застосунку
+        const categories = [
+            { name: "Послуги", badge: "badge--services" },
+            { name: "Бюро знахідок", badge: "badge--lost-found" },
+            { name: "Віддам / Продам", badge: "badge--sales" }
+        ];
+
+        ads = remotePosts.map((post, index) => {
+            const cat = categories[index % categories.length];
+            return {
+                title: post.title.slice(0, 50), // Заголовок з API
+                description: post.body,          // Опис (body з API)
+                category: cat.name,
+                badgeClass: cat.badge,
+                daysAgo: (index * 4) % 25        // Різні дати для демонстрації застарілих
+            };
+        });
+
+        // Виводимо отримані дані в DOM
+        renderAds(ads);
+
+        // При успішному завантаженні приховуємо блок повідомлення
+        statusMessage.className = 'status-message';
+        statusMessage.textContent = '';
+
+    } catch (error) {
+        // Крок 8: Коректна обробка помилок (вимога варіанта 18)
+        console.error('Помилка при завантаженні оголошень з API:', error);
+
+        // Виводимо зрозуміле повідомлення за завданням варіанта 18
+        statusMessage.textContent = '⚠️ Оголошення тимчасово недоступні. Перевірте з\'єднання з мережею.';
+        statusMessage.className = 'status-message error';
+
+        listContainer.innerHTML = '';
+        if (countElement) {
+            countElement.textContent = 'Помилка мережі';
+        }
+    } finally {
+        // Крок 7: Вимикаємо стан блокування кнопки незалежно від результату
+        reloadBtn.disabled = false;
+    }
+}
+
+// Крок 10: Повторний виклик loadAdsFromAPI за кліком на кнопку «Оновити»
+reloadBtn.addEventListener('click', () => {
+    loadAdsFromAPI();
+});
+
+// Початковий запуск завантаження при старті застосунку
+loadAdsFromAPI();
 
 // ==========================================================================
-// ПРАКТИЧНА РОБОТА №8: ОБРОБКА ПОДІЙ ТА ВАЛІДАЦІЯ (Варіант №18)
+// ФОРМА ДОДАВАННЯ ОГОЛОШЕННЯ ТА ВЛАСНА ВАЛІДАЦІЯ (Виправлення зауважень)
 // ==========================================================================
-
-// Селектори елементів форми
 const toggleFormBtn = document.querySelector('#toggle-form-btn');
 const addAdSection = document.querySelector('#add-ad-section');
 const addAdForm = document.querySelector('#add-ad-form');
+
+const titleInput = document.querySelector('#ad-title');
+const categorySelect = document.querySelector('#ad-category');
 const descTextarea = document.querySelector('#ad-description');
+
+const titleError = document.querySelector('#title-error');
+const categoryError = document.querySelector('#category-error');
+const descError = document.querySelector('#desc-error');
+
 const charsLeftSpan = document.querySelector('#chars-left');
 const charCounterDiv = document.querySelector('#char-counter');
 
-// 1. ПОДІЯ CLICK (Варіант 18: показ/приховування форми без окремої сторінки)
+// Відкриття / закриття форми
 toggleFormBtn.addEventListener('click', (event) => {
-    event.preventDefault(); // Запобігаємо переходу за якірним посиланням #add-ad
+    event.preventDefault();
     addAdSection.classList.toggle('visible');
-
-    // Якщо форма відкрилася — автоматично фокусуємося на першому полі
     if (addAdSection.classList.contains('visible')) {
-        document.querySelector('#ad-title').focus();
+        titleInput.focus();
     }
 });
 
-// 2. ПОДІЯ INPUT (Варіант 18: лічильник залишкових символів для description)
+// Динамічний лічильник символів
 const MAX_CHARS = 200;
-
 descTextarea.addEventListener('input', () => {
     const currentLength = descTextarea.value.length;
     const remaining = MAX_CHARS - currentLength;
-
     charsLeftSpan.textContent = remaining;
 
-    // Якщо залишилося менше 20 символів — підсвічуємо червоним кольором
     if (remaining <= 20) {
         charCounterDiv.classList.add('near-limit');
     } else {
         charCounterDiv.classList.remove('near-limit');
     }
+
+    if (descTextarea.value.trim() !== '') {
+        descError.textContent = '';
+        descTextarea.classList.remove('input-error');
+    }
 });
 
-// 3. ПОДІЯ SUBMIT (Варіант 18: обробка форми без перезавантаження)
+titleInput.addEventListener('input', () => {
+    if (titleInput.value.trim() !== '') {
+        titleError.textContent = '';
+        titleInput.classList.remove('input-error');
+    }
+});
+
+categorySelect.addEventListener('change', () => {
+    if (categorySelect.value !== '') {
+        categoryError.textContent = '';
+        categorySelect.classList.remove('input-error');
+    }
+});
+
+// Відправка форми з ВЛАСНОЮ ВАЛІДАЦІЄЮ (захист від пробілів)
 addAdForm.addEventListener('submit', (event) => {
-    // Крок 3: Скасування стандартного перезавантаження сторінки браузером
     event.preventDefault();
 
-    // Крок 4: Зчитування та очищення значень полів
-    const titleValue = document.querySelector('#ad-title').value.trim();
-    const categorySelect = document.querySelector('#ad-category');
-    const categoryValue = categorySelect.value;
-    const descValue = descTextarea.value.trim();
+    let isValid = true;
+    const titleVal = titleInput.value.trim();
+    const categoryVal = categorySelect.value;
+    const descVal = descTextarea.value.trim();
 
-    // Співставлення технічного значення категорії з гарною назвою та класом бейджа
+    // 1. Власна валідація заголовка: не порожній, не з самих пробілів, мін. 3 символи
+    if (titleVal === '') {
+        titleError.textContent = '⚠️ Помилка: заголовок не може бути порожнім або містити лише пробіли!';
+        titleInput.classList.add('input-error');
+        isValid = false;
+    } else if (titleVal.length < 3) {
+        titleError.textContent = '⚠️ Заголовок має містити щонайменше 3 символи!';
+        titleInput.classList.add('input-error');
+        isValid = false;
+    } else {
+        titleError.textContent = '';
+        titleInput.classList.remove('input-error');
+    }
+
+    // 2. Власна валідація категорії
+    if (!categoryVal) {
+        categoryError.textContent = '⚠️ Будь ласка, оберіть категорію зі списку!';
+        categorySelect.classList.add('input-error');
+        isValid = false;
+    } else {
+        categoryError.textContent = '';
+        categorySelect.classList.remove('input-error');
+    }
+
+    // 3. Власна валідація опису: не з самих пробілів
+    if (descVal === '') {
+        descError.textContent = '⚠️ Помилка: опис не може бути порожнім або складатись з пробілів!';
+        descTextarea.classList.add('input-error');
+        isValid = false;
+    } else if (descVal.length < 5) {
+        descError.textContent = '⚠️ Опис занадто короткий (мінімум 5 символів)!';
+        descTextarea.classList.add('input-error');
+        isValid = false;
+    } else {
+        descError.textContent = '';
+        descTextarea.classList.remove('input-error');
+    }
+
+    if (!isValid) return; // Зупиняємо відправку, якщо валідацію не пройдено
+
+    // Формування нового об'єкта при успішній валідації
     let categoryName = "Послуги";
     let badgeClass = "badge--services";
 
-    if (categoryValue === "lost-found") {
+    if (categoryVal === "lost-found") {
         categoryName = "Бюро знахідок";
         badgeClass = "badge--lost-found";
-    } else if (categoryValue === "sales") {
+    } else if (categoryVal === "sales") {
         categoryName = "Віддам / Продам";
         badgeClass = "badge--sales";
     }
 
-    // Крок 5: Формування нового об'єкта оголошення (daysAgo: 0 для нового запису)
     const newAd = {
-        title: titleValue,
-        description: descValue,
+        title: titleVal,
+        description: descVal,
         category: categoryName,
         badgeClass: badgeClass,
-        daysAgo: 0 // Свіже оголошення, щойно створене
+        daysAgo: 0
     };
 
-    // Додаємо нове оголошення на початок масиву
     ads.unshift(newAd);
-
-    // Крок 6: Перемальовуємо список оголошень за допомогою функції рендерингу
     renderAds(ads);
 
-    // Крок 7: Очищення полів форми та скидання лічильника символів
     addAdForm.reset();
     charsLeftSpan.textContent = MAX_CHARS;
     charCounterDiv.classList.remove('near-limit');
-
-    // Ховаємо форму після успішного додавання та сповіщаємо в консоль
     addAdSection.classList.remove('visible');
-    console.log('Нове оголошення успішно додано без перезавантаження сторінки:', newAd);
+    console.log('Нове оголошення успішно пройшло власну валідацію та додане:', newAd);
 });

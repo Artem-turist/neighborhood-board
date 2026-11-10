@@ -16,36 +16,37 @@
                 <li><a href="#services">Послуги</a></li>
                 <li><a href="#lost-found">Бюро знахідок</a></li>
                 <li><a href="#sales">Віддам / Продам</a></li>
-                <!-- Кнопка відкриття/закриття форми (подія click за варіантом 18) -->
                 <li><a href="#add-ad" id="toggle-form-btn" class="btn">Додати оголошення</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <!-- Форма додавання нового оголошення (Практикум №8, варіант 18) -->
+        <!-- Форма додавання нового оголошення з власною валідацією помилок -->
         <section id="add-ad-section" class="form-section">
             <h2>Нове оголошення</h2>
-            <form id="add-ad-form">
+            <form id="add-ad-form" novalidate>
                 <div class="form-group">
                     <label for="ad-title">Заголовок оголошення:</label>
-                    <input type="text" id="ad-title" name="title" placeholder="Наприклад: Знайдено ключі..." required>
+                    <input type="text" id="ad-title" name="title" placeholder="Наприклад: Знайдено ключі...">
+                    <span class="error-message" id="title-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="ad-category">Категорія:</label>
-                    <select id="ad-category" name="category" required>
+                    <select id="ad-category" name="category">
                         <option value="" disabled selected>Оберіть категорію</option>
                         <option value="lost-found">Бюро знахідок</option>
                         <option value="services">Послуги</option>
                         <option value="sales">Віддам / Продам</option>
                     </select>
+                    <span class="error-message" id="category-error"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="ad-description">Опис оголошення:</label>
-                    <textarea id="ad-description" name="description" rows="4" maxlength="200" placeholder="Коротко опишіть суть оголошення (до 200 символів)..." required></textarea>
-                    <!-- Лічильник залишку символів (подія input за варіантом 18) -->
+                    <textarea id="ad-description" name="description" rows="4" maxlength="200" placeholder="Коротко опишіть суть оголошення (до 200 символів)..."></textarea>
+                    <span class="error-message" id="desc-error"></span>
                     <div id="char-counter" class="char-counter">Залишилося символів: <span id="chars-left">200</span></div>
                 </div>
 
@@ -70,12 +71,19 @@
         <section id="ads-list">
             <header class="section-header">
                 <h2>Оголошення</h2>
-                <p id="listings-count">Завантаження кількості оголошень...</p>
+                <div class="header-actions">
+                    <p id="listings-count">Завантаження...</p>
+                    <!-- Крок 10: Кнопка повторного завантаження даних -->
+                    <button id="reload-btn" class="btn-reload" title="Оновити список з сервера">🔄 Оновити</button>
+                </div>
             </header>
+
+            <!-- Блок для повідомлення про стан завантаження або помилку мережі -->
+            <div id="status-message" class="status-message"></div>
 
             <div id="listings-list" class="cards-grid">
                 <article id="static-placeholder" class="card-placeholder">
-                    <h3>Завантаження оголошень зі списку...</h3>
+                    <h3>Завантаження оголошень з сервера...</h3>
                     <p>Будь ласка, зачекайте.</p>
                 </article>
             </div>
