@@ -1,139 +1,138 @@
-
-// Крок 3: URL ендпоінта для отримання даних (Варіант 18)
 const API_URL = 'https://jsonplaceholder.typicode.com/posts?userId=3';
 
-// Масив оголошень у пам'яті (заповнюватиметься з API та форми)
-let ads = [];
-
-// Селектори DOM
-const listContainer = document.querySelector('#listings-list');
-const countElement = document.querySelector('#listings-count');
-const statusMessage = document.querySelector('#status-message');
-const reloadBtn = document.querySelector('#reload-btn');
-
-// --------------------------------------------------------------------------
-// ФУНКЦІЯ РЕНДЕРИНГУ КАРТОК У DOM (з Практикуму №7)
-// --------------------------------------------------------------------------
-function renderAds(adsList) {
-    listContainer.innerHTML = '';
-    let activeCount = 0;
-
-    for (const ad of adsList) {
-        const card = document.createElement('article');
-        card.dataset.daysAgo = ad.daysAgo;
-
-        if (ad.daysAgo > 14) {
-            card.classList.add('outdated');
-        } else {
-            activeCount++;
+const AdCard = {
+    name: 'AdCard',
+    props: {
+        title: { type: String, required: true },
+        category: { type: String, required: true },
+        description: { type: String, required: true },
+        daysAgo: { type: Number, required: true },
+        badgeClass: { type: String, default: 'badge--services' }
+    },
+    data() {
+        return {
+            // Локальний реактивний стан компонента (розгортання/згортання опису)
+            isExpanded: false
+        };
+    },
+    computed: {
+        isOutdated() {
+            return this.daysAgo > 14;
+        },
+        timeLabel() {
+            return this.daysAgo === 0 ? 'Сьогодні' : `${this.daysAgo} дн. тому`;
         }
-
-        // Шапка картки
-        const cardHeader = document.createElement('header');
-        const title = document.createElement('h3');
-        title.textContent = ad.title;
-
-        const time = document.createElement('time');
-        time.textContent = ad.daysAgo === 0 ? 'Сьогодні' : `${ad.daysAgo} дн. тому`;
-
-        cardHeader.append(title, time);
-
-        // Текст опису
-        const desc = document.createElement('p');
-        desc.textContent = ad.description;
-
-        // Підвал з бейджем категорії
-        const cardFooter = document.createElement('footer');
-        const badge = document.createElement('span');
-        badge.classList.add('badge', ad.badgeClass);
-        badge.textContent = ad.category;
-        cardFooter.append(badge);
-
-        card.append(cardHeader, desc, cardFooter);
-        listContainer.append(card);
-    }
-
-    if (countElement) {
-        countElement.textContent = `Активних оголошень: ${activeCount} з ${adsList.length}`;
-    }
-}
-
-// --------------------------------------------------------------------------
-// АСИНХРОННЕ ЗАВАНТАЖЕННЯ ДАНИХ З API (Практикум №9)
-// --------------------------------------------------------------------------
-async function loadAdsFromAPI() {
-    // Крок 7: Візуальний стан завантаження
-    statusMessage.textContent = '⏳ Завантаження свіжих оголошень з сервера...';
-    statusMessage.className = 'status-message loading';
-    reloadBtn.disabled = true;
-
-    try {
-        // Крок 3: Виконання HTTP-запиту через fetch
-        const response = await fetch(API_URL);
-
-        // Крок 4: Перевірка HTTP-статусу (200-299)
-        if (!response.ok) {
-            throw new Error(`Сервер відповів зі статусом помилки: ${response.status}`);
+    },
+    methods: {
+        // Інтерактивна подія варіанта 18: перемикання деталей оголошення
+        toggleDetails() {
+            this.isExpanded = !this.isExpanded;
         }
+    },
+    template: `
+        <article :class="{ outdated: isOutdated }" :data-days-ago="daysAgo">
+            <header>
+                <h3>{{ title }}</h3>
+                <time>{{ timeLabel }}</time>
+            </header>
 
-        // Крок 5: Розбір відповіді як JSON
-        const remotePosts = await response.json();
-        console.log('Дані успішно отримано від API:', remotePosts);
+            <!-- Кнопка-спойлер для розгортання/згортання деталей (Варіант 18) -->
+            <button @click="toggleDetails" class="btn-toggle-details" type="button">
+                {{ isExpanded ? '▲ Згорнути опис' : '▼ Показати деталі' }}
+            </button>
 
-        // Крок 6: Адаптація отриманих полів (title, body) під формат нашого застосунку
-        const categories = [
-            { name: "Послуги", badge: "badge--services" },
-            { name: "Бюро знахідок", badge: "badge--lost-found" },
-            { name: "Віддам / Продам", badge: "badge--sales" }
-        ];
+            <!-- Опис відображається декларативно завдяки v-if і стану isExpanded -->
+            <div v-if="isExpanded" class="card-details">
+                <p>{{ description }}</p>
+            </div>
 
-        ads = remotePosts.map((post, index) => {
-            const cat = categories[index % categories.length];
-            return {
-                title: post.title.slice(0, 50), // Заголовок з API
-                description: post.body,          // Опис (body з API)
-                category: cat.name,
-                badgeClass: cat.badge,
-                daysAgo: (index * 4) % 25        // Різні дати для демонстрації застарілих
-            };
-        });
+            <footer>
+                <span class="badge" :class="badgeClass">{{ category }}</span>
+            </footer>
+        </article>
+    `
+};
 
-        // Виводимо отримані дані в DOM
-        renderAds(ads);
 
-        // При успішному завантаженні приховуємо блок повідомлення
-        statusMessage.className = 'status-message';
-        statusMessage.textContent = '';
-
-    } catch (error) {
-        // Крок 8: Коректна обробка помилок (вимога варіанта 18)
-        console.error('Помилка при завантаженні оголошень з API:', error);
-
-        // Виводимо зрозуміле повідомлення за завданням варіанта 18
-        statusMessage.textContent = '⚠️ Оголошення тимчасово недоступні. Перевірте з\'єднання з мережею.';
-        statusMessage.className = 'status-message error';
-
-        listContainer.innerHTML = '';
-        if (countElement) {
-            countElement.textContent = 'Помилка мережі';
+const app = Vue.createApp({
+    components: {
+        AdCard
+    },
+    data() {
+        return {
+            // Реактивний масив оголошень у стані компонента
+            ads: [],
+            isLoading: false,
+            errorMessage: ''
+        };
+    },
+    computed: {
+        // Похідне значення: автоматичний підрахунок кількості активних оголошень
+        activeCountText() {
+            if (this.isLoading) return 'Завантаження...';
+            if (this.errorMessage) return 'Помилка мережі';
+            const active = this.ads.filter(ad => ad.daysAgo <= 14).length;
+            return `Активних оголошень: ${active} з ${this.ads.length}`;
         }
-    } finally {
-        // Крок 7: Вимикаємо стан блокування кнопки незалежно від результату
-        reloadBtn.disabled = false;
-    }
-}
+    },
+    methods: {
+        // Асинхронне отримання даних з API (Практикум №9)
+        async loadAdsFromAPI() {
+            this.isLoading = true;
+            this.errorMessage = '';
 
-// Крок 10: Повторний виклик loadAdsFromAPI за кліком на кнопку «Оновити»
-reloadBtn.addEventListener('click', () => {
-    loadAdsFromAPI();
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`Сервер відповів зі статусом: ${response.status}`);
+                }
+
+                const remotePosts = await response.json();
+
+                const categories = [
+                    { name: "Послуги", badge: "badge--services" },
+                    { name: "Бюро знахідок", badge: "badge--lost-found" },
+                    { name: "Віддам / Продам", badge: "badge--sales" }
+                ];
+
+                // Оновлюємо реактивний масив
+                this.ads = remotePosts.map((post, index) => {
+                    const cat = categories[index % categories.length];
+                    return {
+                        id: post.id,
+                        title: post.title.slice(0, 50),
+                        description: post.body,
+                        category: cat.name,
+                        badgeClass: cat.badge,
+                        daysAgo: (index * 4) % 25
+                    };
+                });
+            } catch (error) {
+                console.error('Помилка завантаження з API:', error);
+                this.errorMessage = '⚠️ Оголошення тимчасово недоступні. Перевірте з\'єднання з мережею.';
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // Метод для додавання нового оголошення з форми у реактивний стан
+        addNewAd(newAd) {
+            this.ads.unshift({
+                id: Date.now(),
+                ...newAd
+            });
+        }
+    },
+    mounted() {
+        // Автоматичне завантаження даних при монтуванні додатка
+        this.loadAdsFromAPI();
+    }
 });
 
-// Початковий запуск завантаження при старті застосунку
-loadAdsFromAPI();
+// Монтуємо додаток у контейнер #app
+const vm = app.mount('#app');
 
-// ==========================================================================
-// ФОРМА ДОДАВАННЯ ОГОЛОШЕННЯ ТА ВЛАСНА ВАЛІДАЦІЯ (Виправлення зауважень)
-// ==========================================================================
+
 const toggleFormBtn = document.querySelector('#toggle-form-btn');
 const addAdSection = document.querySelector('#add-ad-section');
 const addAdForm = document.querySelector('#add-ad-form');
@@ -158,7 +157,7 @@ toggleFormBtn.addEventListener('click', (event) => {
     }
 });
 
-// Динамічний лічильник символів
+// Лічильник залишку символів
 const MAX_CHARS = 200;
 descTextarea.addEventListener('input', () => {
     const currentLength = descTextarea.value.length;
@@ -191,7 +190,7 @@ categorySelect.addEventListener('change', () => {
     }
 });
 
-// Відправка форми з ВЛАСНОЮ ВАЛІДАЦІЄЮ (захист від пробілів)
+// Відправка форми: валідація та передача об'єкта в реактивний стан Vue
 addAdForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -200,7 +199,6 @@ addAdForm.addEventListener('submit', (event) => {
     const categoryVal = categorySelect.value;
     const descVal = descTextarea.value.trim();
 
-    // 1. Власна валідація заголовка: не порожній, не з самих пробілів, мін. 3 символи
     if (titleVal === '') {
         titleError.textContent = '⚠️ Помилка: заголовок не може бути порожнім або містити лише пробіли!';
         titleInput.classList.add('input-error');
@@ -214,7 +212,6 @@ addAdForm.addEventListener('submit', (event) => {
         titleInput.classList.remove('input-error');
     }
 
-    // 2. Власна валідація категорії
     if (!categoryVal) {
         categoryError.textContent = '⚠️ Будь ласка, оберіть категорію зі списку!';
         categorySelect.classList.add('input-error');
@@ -224,7 +221,6 @@ addAdForm.addEventListener('submit', (event) => {
         categorySelect.classList.remove('input-error');
     }
 
-    // 3. Власна валідація опису: не з самих пробілів
     if (descVal === '') {
         descError.textContent = '⚠️ Помилка: опис не може бути порожнім або складатись з пробілів!';
         descTextarea.classList.add('input-error');
@@ -238,9 +234,8 @@ addAdForm.addEventListener('submit', (event) => {
         descTextarea.classList.remove('input-error');
     }
 
-    if (!isValid) return; // Зупиняємо відправку, якщо валідацію не пройдено
+    if (!isValid) return;
 
-    // Формування нового об'єкта при успішній валідації
     let categoryName = "Послуги";
     let badgeClass = "badge--services";
 
@@ -252,20 +247,18 @@ addAdForm.addEventListener('submit', (event) => {
         badgeClass = "badge--sales";
     }
 
-    const newAd = {
+    // Додаємо нове оголошення прямо в реактивний стан Vue-додатка!
+    vm.addNewAd({
         title: titleVal,
         description: descVal,
         category: categoryName,
         badgeClass: badgeClass,
         daysAgo: 0
-    };
-
-    ads.unshift(newAd);
-    renderAds(ads);
+    });
 
     addAdForm.reset();
     charsLeftSpan.textContent = MAX_CHARS;
     charCounterDiv.classList.remove('near-limit');
     addAdSection.classList.remove('visible');
-    console.log('Нове оголошення успішно пройшло власну валідацію та додане:', newAd);
+    console.log('Нове оголошення передано в реактивний стан Vue 3!');
 });

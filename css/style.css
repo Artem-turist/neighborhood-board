@@ -1,17 +1,9 @@
-/* ==========================================================================
-   1. ГЛОБАЛЬНЕ СКИДАННЯ ТА БЛОКОВА МОДЕЛЬ
-   ========================================================================== */
+
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* ==========================================================================
-   2. ТИПОГРАФІКА ТА БАЗОВІ НАЛАШТУВАННЯ
-   Баланс кольорів 60-30-10:
-   - 60% нейтральний крафтовий фон (#f7f4ef)
-   - 30% білі плашки та картки (#ffffff), м'який контрастний текст (#2d2621)
-   - 10% теплий теракотовий акцент (#b85d19)
-   ========================================================================== */
+
 body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -26,9 +18,6 @@ img {
     display: block;
 }
 
-/* ==========================================================================
-   3. ШАПКА ТА НАВІГАЦІЯ
-   ========================================================================== */
 header {
     background-color: #ffffff;
     border-bottom: 1px solid #e5ded3;
@@ -82,9 +71,6 @@ nav a.btn:hover {
     color: #ffffff;
 }
 
-/* ==========================================================================
-   4. КОМПОЗИЦІЯ ТА ВІЗУАЛЬНА ІЄРАРХІЯ
-   ========================================================================== */
 main, aside {
     max-width: 1100px;
     margin: 28px auto;
@@ -142,9 +128,6 @@ h2 {
     background-color: #332a23;
 }
 
-/* ==========================================================================
-   5. КАРТКИ ОГОЛОШЕНЬ ТА НЕЧІТКА ВИМОГА
-   ========================================================================== */
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -194,12 +177,6 @@ article time {
     white-space: nowrap;
 }
 
-article img {
-    margin: 14px 0;
-    border-radius: 6px;
-    background-color: #ede7de;
-}
-
 article p {
     font-size: 0.95rem;
     color: #42372f;
@@ -214,9 +191,6 @@ article footer {
     color: #695d53;
 }
 
-/* ==========================================================================
-   6. ЧІТКА ВИМОГА: КОЛЬОРОВІ БЕЙДЖІ КАТЕГОРІЙ
-   ========================================================================== */
 .badge {
     display: inline-block;
     padding: 3px 10px;
@@ -241,9 +215,7 @@ article footer {
     color: #8c3b08;
 }
 
-/* ==========================================================================
-   7. ДЕТАЛІ ОГОЛОШЕННЯ ТА ПІДВАЛ
-   ========================================================================== */
+
 aside#ad-details {
     background-color: #f0ebe1;
     border: 1px solid #ded5c7;
@@ -277,9 +249,7 @@ body > footer {
     margin-top: 40px;
 }
 
-/* ==========================================================================
-   8. АДАПТИВНІСТЬ: BREAKPOINTS
-   ========================================================================== */
+
 @media (min-width: 600px) {
     nav ul {
         flex-direction: row;
@@ -317,9 +287,7 @@ body > footer {
     }
 }
 
-/* ==========================================================================
-   9. ПРАКТИЧНА РОБОТА №7: ДИНАМІЧНИЙ DOM ТА КЛАСИ
-   ========================================================================== */
+
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -339,7 +307,7 @@ body > footer {
     gap: 10px;
 }
 
-#listings-count {
+.listings-badge {
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
@@ -367,9 +335,7 @@ article.outdated::before {
     display: block;
 }
 
-/* ==========================================================================
-   10. ПРАКТИЧНА РОБОТА №8: ФОРМА ДОДАВАННЯ ТА ВАЛІДАЦІЯ
-   ========================================================================== */
+
 #add-ad-section {
     display: none;
     background-color: #ffffff;
@@ -431,7 +397,6 @@ article.outdated::before {
     background-color: #fff5f5;
 }
 
-/* Повідомлення про власну валідацію (зауваження викладача) */
 .error-message {
     color: #c92a2a;
     font-size: 0.82rem;
@@ -466,11 +431,7 @@ article.outdated::before {
     }
 }
 
-/* ==========================================================================
-   11. ПРАКТИЧНА РОБОТА №9: КЛІЄНТ ДЛЯ API (FETCH/AJAX)
-   ========================================================================== */
 
-/* Кнопка оновлення списку (Крок 10) */
 .btn-reload {
     background-color: #ffffff;
     color: #594c42;
@@ -494,9 +455,7 @@ article.outdated::before {
     cursor: not-allowed;
 }
 
-/* Блок стану завантаження та помилок мережі */
 .status-message {
-    display: none;
     padding: 14px 18px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -505,15 +464,46 @@ article.outdated::before {
 }
 
 .status-message.loading {
-    display: block;
     background-color: #e3edf7;
     color: #174a7a;
     border: 1px solid #bfdbfe;
 }
 
 .status-message.error {
-    display: block;
     background-color: #fee2e2;
     color: #991b1b;
     border: 1px solid #fecaca;
+}
+
+
+.btn-toggle-details {
+    background: none;
+    border: none;
+    color: #b85d19;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 8px;
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+}
+
+.btn-toggle-details:hover {
+    color: #9c4c11;
+    text-decoration: underline;
+}
+
+/* Блок опису, що плавно розгортається реактивним прапорцем isExpanded */
+.card-details {
+    background-color: #faf7f2;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #b85d19;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    animation: fadeIn 0.25s ease;
 }
