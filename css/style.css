@@ -1,8 +1,9 @@
-
+/* ==========================================================================
+   1. ГЛОБАЛЬНЕ СКИДАННЯ ТА БЛОКОВА МОДЕЛЬ
+   ========================================================================== */
 *, *::before, *::after {
     box-sizing: border-box;
 }
-
 
 body {
     margin: 0;
@@ -18,6 +19,9 @@ img {
     display: block;
 }
 
+/* ==========================================================================
+   3. ШАПКА ТА НАВІГАЦІЯ
+   ========================================================================== */
 header {
     background-color: #ffffff;
     border-bottom: 1px solid #e5ded3;
@@ -53,7 +57,6 @@ nav a:hover {
     color: #b85d19;
 }
 
-/* Акцентна кнопка додавання */
 nav a.btn {
     background-color: #b85d19;
     color: #ffffff;
@@ -71,6 +74,9 @@ nav a.btn:hover {
     color: #ffffff;
 }
 
+/* ==========================================================================
+   4. КОМПОЗИЦІЯ ТА ВІЗУАЛЬНА ІЄРАРХІЯ
+   ========================================================================== */
 main, aside {
     max-width: 1100px;
     margin: 28px auto;
@@ -90,7 +96,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Форма фільтрації */
 #filter-section form {
     background-color: #ffffff;
     padding: 18px 20px;
@@ -128,6 +133,9 @@ h2 {
     background-color: #332a23;
 }
 
+/* ==========================================================================
+   5. КАРТКИ ОГОЛОШЕНЬ
+   ========================================================================== */
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -177,20 +185,18 @@ article time {
     white-space: nowrap;
 }
 
-article p {
-    font-size: 0.95rem;
-    color: #42372f;
-    margin: 8px 0;
-}
-
 article footer {
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid #f0eae1;
-    font-size: 0.85rem;
-    color: #695d53;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+/* ==========================================================================
+   6. КОЛЬОРОВІ БЕЙДЖІ КАТЕГОРІЙ
+   ========================================================================== */
 .badge {
     display: inline-block;
     padding: 3px 10px;
@@ -215,7 +221,9 @@ article footer {
     color: #8c3b08;
 }
 
-
+/* ==========================================================================
+   7. ДЕТАЛІ ОГОЛОШЕННЯ ТА ПІДВАЛ
+   ========================================================================== */
 aside#ad-details {
     background-color: #f0ebe1;
     border: 1px solid #ded5c7;
@@ -249,7 +257,9 @@ body > footer {
     margin-top: 40px;
 }
 
-
+/* ==========================================================================
+   8. АДАПТИВНІСТЬ: BREAKPOINTS
+   ========================================================================== */
 @media (min-width: 600px) {
     nav ul {
         flex-direction: row;
@@ -287,7 +297,9 @@ body > footer {
     }
 }
 
-
+/* ==========================================================================
+   9. ЗАСТАРІЛІ ОГОЛОШЕННЯ ТА ЛІЧИЛЬНИК
+   ========================================================================== */
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -335,7 +347,9 @@ article.outdated::before {
     display: block;
 }
 
-
+/* ==========================================================================
+   10. ФОРМА ДОДАВАННЯ ТА ВАЛІДАЦІЯ
+   ========================================================================== */
 #add-ad-section {
     display: none;
     background-color: #ffffff;
@@ -431,7 +445,9 @@ article.outdated::before {
     }
 }
 
-
+/* ==========================================================================
+   11. СТАТУСИ ЗАВАНТАЖЕННЯ ТА КНОПКА ОНОВИТИ
+   ========================================================================== */
 .btn-reload {
     background-color: #ffffff;
     color: #594c42;
@@ -475,7 +491,9 @@ article.outdated::before {
     border: 1px solid #fecaca;
 }
 
-
+/* ==========================================================================
+   12. СТИЛІ КОМПОНЕНТА AdCard ТА КНОПКИ ВИДАЛЕННЯ (Практикум №11, Варіант 18)
+   ========================================================================== */
 .btn-toggle-details {
     background: none;
     border: none;
@@ -497,7 +515,6 @@ article.outdated::before {
     text-decoration: underline;
 }
 
-/* Блок опису, що плавно розгортається реактивним прапорцем isExpanded */
 .card-details {
     background-color: #faf7f2;
     padding: 10px 12px;
@@ -506,4 +523,22 @@ article.outdated::before {
     margin-top: 8px;
     font-size: 0.9rem;
     animation: fadeIn 0.25s ease;
+}
+
+/* Кнопка видалення картки з IndexedDB (Варіант 18) */
+.btn-delete-ad {
+    background: none;
+    border: 1px solid transparent;
+    color: #c92a2a;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-ad:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
 }

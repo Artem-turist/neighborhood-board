@@ -6,7 +6,7 @@
     <title>Дошка оголошень</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="css/style.css">
-    <!-- Крок 2 (Практикум №10): Підключення Vue 3 через CDN без збірки та Node.js -->
+    <!-- Vue 3 через CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="js/app.js" defer></script>
 </head>
@@ -70,38 +70,38 @@
             </form>
         </section>
 
-        <!-- Декларативна секція Vue-додатка (Практикум №10) -->
+        <!-- Vue-секція списку оголошень із підтримкою IndexedDB -->
         <section id="app" class="ads-section">
             <header class="section-header">
                 <h2>Оголошення</h2>
                 <div class="header-actions">
-                    <!-- Реактивний лічильник активних оголошень через computed -->
                     <p id="listings-count" class="listings-badge">{{ activeCountText }}</p>
-                    <button @click="loadAdsFromAPI" :disabled="isLoading" class="btn-reload" title="Оновити список з сервера">
+                    <button @click="refreshData" :disabled="isLoading" class="btn-reload" title="Оновити список з бази даних">
                         {{ isLoading ? '⏳ Завантаження...' : '🔄 Оновити' }}
                     </button>
                 </div>
             </header>
 
-            <!-- Реактивні повідомлення про стан (loading / error) -->
             <div v-if="isLoading" class="status-message loading">
-                ⏳ Завантаження свіжих оголошень з сервера...
+                ⏳ Завантаження оголошень з IndexedDB...
             </div>
 
             <div v-if="errorMessage" class="status-message error">
                 {{ errorMessage }}
             </div>
 
-            <!-- Реактивна сітка: v-for з обов'язковим :key та компонентом AdCard -->
             <div v-if="!isLoading && !errorMessage" class="cards-grid">
+                <!-- Компонент AdCard із підтримкою видалення (Варіант 18) -->
                 <ad-card
                     v-for="ad in ads"
                     :key="ad.id"
+                    :id="ad.id"
                     :title="ad.title"
                     :category="ad.category"
                     :description="ad.description"
                     :days-ago="ad.daysAgo"
                     :badge-class="ad.badgeClass"
+                    @delete-ad="removeAd"
                 ></ad-card>
             </div>
         </section>
