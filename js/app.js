@@ -1,16 +1,22 @@
+// ==========================================================================
+// Комп'ютерний практикум №12: Анімація та інтерактивні елементи
+// Варіант №18: Дошка сусідських оголошень (CSS slide-down + fade-in, badge--new)
+// Студент: Музиченко А.А., група ІП-55
+// ==========================================================================
+
 const API_URL = 'https://jsonplaceholder.typicode.com/posts?userId=3';
 const DB_NAME = 'NeighborhoodBoardDB';
 const DB_VERSION = 1;
-const STORE_NAME = 'posts'; // Варіант 18: сховище "posts"
+const STORE_NAME = 'posts';
 
 // --------------------------------------------------------------------------
-// ЕТАП 1: РОБОТА З LOCALSTORAGE (Кроки 2-4)
+// LOCALSTORAGE ТА INDEXEDDB (Практикум №11)
 // --------------------------------------------------------------------------
 function saveToLocalStorage(items) {
     try {
         localStorage.setItem('neighborhood_ads', JSON.stringify(items));
     } catch (error) {
-        console.error('Помилка збереження в localStorage:', error);
+        console.error('Помилка запису в localStorage:', error);
     }
 }
 
@@ -27,23 +33,17 @@ function loadFromLocalStorage() {
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        // Створення object store при першому відкритті бази (Крок 6)
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                // Варіант 18: сховище "posts", keyPath "id"
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                console.log(`[IndexedDB] Сховище "${STORE_NAME}" успішно створено з keyPath "id"`);
             }
         };
-
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
 }
 
-// Додавання або оновлення оголошення в IndexedDB (put)
 async function putPostDB(post) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
@@ -54,7 +54,6 @@ async function putPostDB(post) {
     });
 }
 
-// Отримання всіх оголошень з IndexedDB (getAll)
 async function getAllPostsDB() {
     const db = await openDB();
     return new Promise((resolve, reject) => {
@@ -65,7 +64,6 @@ async function getAllPostsDB() {
     });
 }
 
-// Видалення оголошення з IndexedDB за id (delete) - Варіант 18
 async function deletePostDB(id) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
@@ -82,15 +80,16 @@ async function migrateFromLocalStorage() {
 
     const localData = loadFromLocalStorage();
     if (localData && localData.length > 0) {
-        console.log(`[Міграція] Перенесення ${localData.length} записів із localStorage в IndexedDB...`);
         for (const item of localData) {
             await putPostDB(item);
         }
         localStorage.setItem('migrated_to_idb', 'true');
-        console.log('[Міграція] Одноразову міграцію успішно завершено!');
     }
 }
 
+// --------------------------------------------------------------------------
+// КОМПОНЕНТ AdCard (З АНІМАЦІЄЮ ПОЯВИ ТА ЗГАСАЮЧИМ БЕЙДЖЕМ "НОВЕ" - Варіант 18)
+// --------------------------------------------------------------------------
 const AdCard = {
     name: 'AdCard',
     props: {
@@ -99,12 +98,15 @@ const AdCard = {
         category: { type: String, required: true },
         description: { type: String, required: true },
         daysAgo: { type: Number, required: true },
-        badgeClass: { type: String, default: 'badge--services' }
+        badgeClass: { type: String, default: 'badge--services' },
+        initialIsNew: { type: Boolean, default: false } // Чи нове оголошення
     },
     emits: ['delete-ad'],
     data() {
         return {
-            isExpanded: false
+            isExpanded: false,
+            // Локальний прапорець для позначки «Нове»
+            isNewBadgeVisible: this.initialIsNew
         };
     },
     computed: {
@@ -115,19 +117,30 @@ const AdCard = {
             return this.daysAgo === 0 ? 'Сьогодні' : `${this.daysAgo} дн. тому`;
         }
     },
+    mounted() {
+        // Крок 6 і Варіант 18: позначка «Нове» плавно згасає та зникає через 4.5 секунди
+        if (this.isNewBadgeVisible) {
+            setTimeout(() => {
+                this.isNewBadgeVisible = false;
+            }, 4500);
+        }
+    },
     methods: {
         toggleDetails() {
             this.isExpanded = !this.isExpanded;
         },
         handleDelete() {
-            // Передаємо подію видалення батьківському компоненту
             this.$emit('delete-ad', this.id);
         }
     },
     template: `
-        <article :class="{ outdated: isOutdated }" :data-days-ago="daysAgo">
+        <article :class="{ outdated: isOutdated, 'card--new': initialIsNew }" :data-days-ago="daysAgo">
             <header>
-                <h3>{{ title }}</h3>
+                <div class="card-title-row">
+                    <h3>{{ title }}</h3>
+                    <!-- Позначка «Нове» за варіантом 18 (пульсує і плавно згасає) -->
+                    <span v-if="isNewBadgeVisible" class="badge--new">🔥 Нове</span>
+                </div>
                 <time>{{ timeLabel }}</time>
             </header>
 
@@ -141,7 +154,6 @@ const AdCard = {
 
             <footer>
                 <span class="badge" :class="badgeClass">{{ category }}</span>
-                <!-- Видалення за варіантом 18 (особливо актуально для застарілих) -->
                 <button @click="handleDelete" class="btn-delete-ad" title="Видалити це оголошення">
                     🗑️ Видалити
                 </button>
@@ -150,6 +162,9 @@ const AdCard = {
     `
 };
 
+// --------------------------------------------------------------------------
+// КОРЕНЕВИЙ VUE-ДОДАТОК
+// --------------------------------------------------------------------------
 const app = Vue.createApp({
     components: {
         AdCard
@@ -170,7 +185,6 @@ const app = Vue.createApp({
         }
     },
     methods: {
-        // Оновлення списку (читання безпосередньо з IndexedDB)
         async refreshData() {
             this.isLoading = true;
             this.errorMessage = '';
@@ -184,11 +198,9 @@ const app = Vue.createApp({
             }
         },
 
-        // Видалення оголошення (CRUD: Delete) - Варіант 18
         async removeAd(id) {
             try {
                 await deletePostDB(id);
-                // Оновлюємо стан у пам'яті та синхронізуємо localStorage
                 this.ads = this.ads.filter(ad => ad.id !== id);
                 saveToLocalStorage(this.ads);
                 console.log(`[IndexedDB] Оголошення id: ${id} успішно видалено!`);
@@ -198,37 +210,39 @@ const app = Vue.createApp({
             }
         },
 
-        // Додавання нового оголошення (CRUD: Create/Put) - Варіант 18
-        async addNewAd(newAd) {
+        // Додавання нового оголошення з анімацією появи (Варіант 18)
+        async addNewAd(newAdData) {
             try {
                 const post = {
                     id: Date.now(),
-                    ...newAd
+                    ...newAdData,
+                    isNew: true // Вмикаємо анімацію slide-down та бейдж «Нове»
                 };
-                await putPostDB(post);
+
+                // Зберігаємо в IndexedDB (без прапорця isNew для чистоти бази)
+                const dbCopy = { ...post };
+                delete dbCopy.isNew;
+                await putPostDB(dbCopy);
+
+                // Додаємо на початок масиву для реактивної анімації появи вгорі стрічки
                 this.ads.unshift(post);
                 saveToLocalStorage(this.ads);
-                console.log('[IndexedDB] Нове оголошення додано в базу:', post);
+
+                console.log('[Анімація] Нове оголошення додано вгору стрічки з анімацією slideDownFadeIn:', post);
             } catch (err) {
                 console.error('[IndexedDB] Помилка додавання:', err);
             }
         },
 
-        // Початкова ініціалізація даних при старті
         async initData() {
             this.isLoading = true;
             this.errorMessage = '';
 
             try {
-                // 1. Спроба виконати одноразову міграцію з localStorage
                 await migrateFromLocalStorage();
-
-                // 2. Читаємо актуальні дані з IndexedDB
                 let dbPosts = await getAllPostsDB();
 
-                // 3. Якщо база зовсім порожня (перший запуск) - підвантажуємо з API і зберігаємо
                 if (!dbPosts || dbPosts.length === 0) {
-                    console.log('[IndexedDB] База порожня, завантаження початкових даних з API...');
                     const response = await fetch(API_URL);
                     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                     const remotePosts = await response.json();
@@ -251,7 +265,6 @@ const app = Vue.createApp({
                         };
                     });
 
-                    // Зберігаємо завантажені дані в обидва сховища
                     saveToLocalStorage(dbPosts);
                     for (const post of dbPosts) {
                         await putPostDB(post);
@@ -274,6 +287,9 @@ const app = Vue.createApp({
 
 const vm = app.mount('#app');
 
+// ==========================================================================
+// ФОРМА ДОДАВАННЯ ОГОЛОШЕННЯ (З власною валідацією)
+// ==========================================================================
 const toggleFormBtn = document.querySelector('#toggle-form-btn');
 const addAdSection = document.querySelector('#add-ad-section');
 const addAdForm = document.querySelector('#add-ad-form');
@@ -385,7 +401,7 @@ addAdForm.addEventListener('submit', (event) => {
         badgeClass = "badge--sales";
     }
 
-    // Додаємо оголошення (викликається збереження в IndexedDB та localStorage!)
+    // Додаємо нове оголошення (запускає анімацію появи та бейдж "Нове"!)
     vm.addNewAd({
         title: titleVal,
         description: descVal,

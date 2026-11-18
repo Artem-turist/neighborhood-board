@@ -5,6 +5,13 @@
     box-sizing: border-box;
 }
 
+/* ==========================================================================
+   2. ТИПОГРАФІКА ТА БАЗОВІ НАЛАШТУВАННЯ
+   Баланс кольорів 60-30-10:
+   - 60% нейтральний крафтовий фон (#f7f4ef)
+   - 30% білі плашки та картки (#ffffff), м'який контрастний текст (#2d2621)
+   - 10% теплий теракотовий акцент (#b85d19)
+   ========================================================================== */
 body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -57,6 +64,7 @@ nav a:hover {
     color: #b85d19;
 }
 
+/* Акцентна кнопка додавання */
 nav a.btn {
     background-color: #b85d19;
     color: #ffffff;
@@ -169,6 +177,14 @@ article header {
     border: none;
     box-shadow: none;
     background-color: transparent;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
 }
 
 article h3 {
@@ -358,16 +374,11 @@ article.outdated::before {
     border: 1px solid #e5ded3;
     box-shadow: 0 4px 12px rgba(45, 38, 33, 0.06);
     margin-bottom: 32px;
-    animation: fadeIn 0.3s ease;
 }
 
 #add-ad-section.visible {
     display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    animation: slideDownFadeIn 0.35s ease-out;
 }
 
 .form-group {
@@ -492,7 +503,7 @@ article.outdated::before {
 }
 
 /* ==========================================================================
-   12. СТИЛІ КОМПОНЕНТА AdCard ТА КНОПКИ ВИДАЛЕННЯ (Практикум №11, Варіант 18)
+   12. СТИЛІ КОМПОНЕНТА AdCard
    ========================================================================== */
 .btn-toggle-details {
     background: none;
@@ -522,10 +533,14 @@ article.outdated::before {
     border-left: 3px solid #b85d19;
     margin-top: 8px;
     font-size: 0.9rem;
-    animation: fadeIn 0.25s ease;
+    animation: fadeInDetails 0.25s ease;
 }
 
-/* Кнопка видалення картки з IndexedDB (Варіант 18) */
+@keyframes fadeInDetails {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .btn-delete-ad {
     background: none;
     border: 1px solid transparent;
@@ -541,4 +556,76 @@ article.outdated::before {
 .btn-delete-ad:hover {
     background-color: #fee2e2;
     border-color: #fca5a5;
+}
+
+/* ==========================================================================
+   13. ПРАКТИЧНА РОБОТА №12: АНІМАЦІЇ ДЛЯ ВАРІАНТА №18
+   - Плавна поява нового оголошення вгорі стрічки (slide-down + fade-in)
+   - Позначка «Нове» з пульсацією та плавним згасанням через кілька секунд
+   ========================================================================== */
+
+/* Ключові кадри: плавне виїжджання зверху (slide-down) та прозорість (fade-in) */
+@keyframes slideDownFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Клас анімації для щойно доданої картки */
+article.card--new {
+    animation: slideDownFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    border-color: #fbd38d;
+    box-shadow: 0 4px 16px rgba(184, 93, 25, 0.12);
+}
+
+/* Ключові кадри: легка пульсація бейджа «Нове» */
+@keyframes pulseGlow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(197, 48, 48, 0.4);
+    }
+    50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 4px rgba(197, 48, 48, 0);
+    }
+}
+
+/* Ключові кадри: плавне згасання бейджа через 4 секунди */
+@keyframes fadeOutBadge {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.85);
+        display: none;
+    }
+}
+
+/* Стиль акцентного бейджа «Нове» (Варіант 18) */
+.badge--new {
+    background: linear-gradient(135deg, #e53e3e, #dd6b20);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    animation: pulseGlow 1.2s ease-in-out infinite, fadeOutBadge 4.5s ease-in forwards;
+    box-shadow: 0 2px 4px rgba(229, 62, 62, 0.25);
+    flex-shrink: 0;
 }
